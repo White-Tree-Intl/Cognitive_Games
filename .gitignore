@@ -16,3 +16,8 @@ instance/
 
 # Environment variables
 .env
+
+# PyInstaller files
+build/
+dist/
+*.spec

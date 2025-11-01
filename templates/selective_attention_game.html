@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" {% if lang == 'fa' %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ strings.SAT }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        window.LANG = "{{ lang }}";
+        window.STRINGS = {{ strings|tojson }};
+    </script>
+</head>
+<body>
+
+    <div id="target-definition-overlay" class="phase-transition-overlay">
+        <h2>{{ strings.target_label }}</h2>
+        <p>{{ strings.sat_instructions_line1 }}</p>
+        <div id="target-display" class="sat-target-display">
+            </div>
+        <button id="start-phase-btn" class="game-button">{{ strings.start_practice_button }}</button>
+    </div>
+
+    <div id="phase-transition-overlay" class="phase-transition-overlay" style="display: none;">
+        <h2>{{ strings.practice_over_title }}</h2>
+        <p>{{ strings.get_ready_for_main_test }}</p>
+        <div class="button-group">
+            <button id="practice-again-btn" class="game-button secondary">{{ strings.practice_again_button }}</button>
+            <button id="start-main-game-btn" class="game-button">{{ strings.start_main_game_button }}</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <h1 id="game-title">{{ strings.SAT }}</h1>
+
+        <div class="info-header" style="display: none;">
+            <div>{{ strings.current_trial_label }}: <span id="current-trial-display">0 / 0</span></div>
+            <div>{{ strings.time_left_label }}: <span id="time-left-display">0</span>s</div>
+        </div>
+
+        <div id="game-area" class="sat-game-area" style="display: none;">
+            <div id="stimuli-grid" class="stimuli-grid"></div>
+        </div>
+
+        <div id="end-game-screen" style="display: none;">
+             <div id="message-display-end" class="message"></div>
+        </div>
+
+        <div id="response-controls" class="fixed-bottom-controls" style="display: none;">
+            <button id="confirm-button" class="game-button">{{ strings.confirm_button }}</button>
+        </div>
+
+        <div id="message-display" class="message"></div>
+
+        <a href="{{ url_for('select_game', lang=lang) }}" class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            <span>{{ strings.back_to_selection }}</span>
+        </a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/selective_attention_game.js') }}"></script>
+</body>
+</html>

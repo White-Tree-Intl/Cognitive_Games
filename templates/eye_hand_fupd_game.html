@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" {% if lang == 'fa' %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ strings.EHC_FUPD }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        window.LANG = "{{ lang }}";
+        window.STRINGS = {{ strings|tojson }};
+    </script>
+</head>
+<body>
+
+    <!-- This div is for the rotate device prompt on mobile -->
+    <div id="rotate-prompt" class="rotate-prompt">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.48 2.52c3.27 1.55 5.61 4.72 5.97 8.48h-2.02c-.33-2.88-2.1-5.33-4.56-6.67l1.61-1.81zM7.52 21.48C4.25 19.93 1.91 16.76 1.55 13H3.57c.33 2.88 2.1 5.33 4.56 6.67l-1.61 1.81zM21.95 11H19.93c-.33-2.88-2.1-5.33-4.56-6.67l1.61-1.81c3.27 1.55 5.61 4.72 5.97 8.48zM4.07 13H2.05c.36-3.76 2.7-6.93 5.97-8.48l-1.61 1.81C3.93 7.67 2.15 10.12 1.83 13h2.24z"/></svg>
+        <p>{{ strings.rotate_device_message }}</p>
+    </div>
+
+    <!-- This div is for the message between practice and main game -->
+    <div id="phase-transition-overlay" class="phase-transition-overlay">
+        <h2>{{ strings.practice_complete_message }}</h2>
+        <p>{{ strings.get_ready_for_main_test }}</p>
+        <div class="button-group">
+            <button id="practice-again-btn" class="game-button secondary">{{ strings.practice_again_button }}</button>
+            <button id="start-main-game-btn" class="game-button">{{ strings.start_main_game_button }}</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <h1 id="game-title">{{ strings.EHC_FUPD }}</h1>
+
+        <!-- Progress Bar for Laps -->
+        <div class="progress-bar-container" style="display: none;">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+            <span id="progressText" class="progress-text"></span>
+        </div>
+
+        <!-- Instructions Screen -->
+        <div id="instructions-screen">
+            <h2>{{ strings.ehc_instructions_title }}</h2>
+            <p>{{ strings.ehc_fupd_instructions_line1 }}</p>
+            <p>{{ strings.ehc_instructions_line2 }}</p>
+            <p>{{ strings.ehc_instructions_line3 }}</p>
+            <button id="start-game-btn" class="game-button">{{ strings.start_game_button }}</button>
+        </div>
+
+        <!-- Game Area (hidden initially) -->
+        <div id="game-area" class="ehc-fupd-game-area" style="display: none;">
+            <svg id="track" width="100%" height="100%">
+                <rect x="15%" y="15%" width="70%" height="70%" rx="20" ry="20" class="track-outer"/>
+                <rect x="20%" y="20%" width="60%" height="60%" class="track-inner"/>
+            </svg>
+            <div id="ball" class="ball"></div>
+
+            <div id="touch-marker"></div>
+
+        </div>
+
+        <!-- Message Display Area -->
+        <div id="end-game-screen" style="display: none;">
+            <div id="message-display" class="message"></div>
+        </div>
+
+        <a href="{{ url_for('select_game', lang=lang) }}" class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            <span>{{ strings.back_to_selection }}</span>
+        </a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/eye_hand_fupd_game.js') }}"></script>
+</body>
+</html>

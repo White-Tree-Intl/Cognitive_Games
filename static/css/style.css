@@ -1,0 +1,1009 @@
+/* static/css/style.css */
+:root {
+    --primary-color: #002147;
+    --secondary-color: #0077BE;
+    --background-color: #F0F8FF;
+    --text-color: #333;
+    --disabled-color: #6c757d;
+    --progress-color: #0077BE;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --line-color: #ccc;
+}
+
+
+/* =============================================== */
+/* === 1. BASE STYLES (MOBILE-FIRST) === */
+/* =============================================== */
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px 0; /* Add padding to top and bottom */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent; /* Removes blue tap highlight on mobile */
+}
+
+h1, h2 {
+    color: var(--primary-color);
+}
+
+/* --- Layout Containers (Mobile) --- */
+.container, .game-container {
+    width: 100%;
+    max-width: 600px; /* Limit max width on larger screens */
+    min-height: calc(100vh - 40px); /* Full height minus body padding */
+    padding: 20px 15px;
+    box-sizing: border-box;
+    text-align: center;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    /* FIX 4: Ensure children are centered for back button */
+    align-items: center;
+}
+
+/* --- Buttons (Mobile) --- */
+.game-button, .back-button {
+    display: block;
+    width: 90%;
+    max-width: 400px;
+    padding: 15px 20px;
+    margin: 15px auto;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    background-color: var(--secondary-color);
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+.game-button:hover {
+    background-color: var(--primary-color);
+}
+.game-button:active {
+    transform: scale(0.98); /* Visual feedback on tap */
+}
+.game-button:disabled {
+    background-color: var(--disabled-color);
+    cursor: not-allowed;
+}
+.back-button {
+    background-color: #6c757d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: auto; /* override block width */
+    padding: 10px 20px;
+    /* FIX 4: Center the button horizontally within the aligned game-container */
+    margin: 20px auto 10px auto;
+}
+.back-button:hover { background-color: #5a6268; }
+.back-button svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+}
+
+
+/* --- General Game Elements (Mobile) --- */
+.progress-bar-container {
+    width: 90%;
+    height: 20px;
+    border-radius: 10px;
+    margin: 20px auto;
+    position: relative;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--progress-color);
+    border-radius: 8px;
+    transition: width 0.3s ease-in-out;
+}
+.progress-text {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #333;
+    font-size: 0.8rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.message {
+    margin-top: 15px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    min-height: 1.5em;
+    font-size: 1.2em;
+}
+
+/* =============================================== */
+/* === 2. GAME-SPECIFIC STYLES (MOBILE-FIRST) === */
+/* =============================================== */
+
+/* --- Game Selection --- */
+.game-list { list-style: none; padding: 0; }
+.game-list li { margin-bottom: 10px; }
+.progress-tracker { display: none; } /* Hide complex progress bar on mobile by default */
+.lang-switcher { margin-top: 25px; font-size: 0.9em; }
+.lang-switcher a { color: var(--secondary-color); text-decoration: none; font-weight: bold; }
+
+
+/* --- IOR Game (Responsive) --- */
+.ior-game-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 45vw;
+    max-height: 250px;
+    margin: 20px auto;
+}
+.ior-game-area .ior-circle {
+    width: 38vw;
+    height: 38vw;
+    max-width: 140px;
+    max-height: 140px;
+    border-radius: 50%;
+    background-color: #ccc;
+    border: 2px solid #999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.1s ease;
+}
+.ior-game-area .fixation-point {
+    font-size: 40px;
+    font-weight: bold;
+    color: var(--primary-color);
+    min-width: 50px;
+    text-align: center;
+}
+.ior-game-area .small-yellow-dot {
+    width: 40%;
+    height: 40%;
+    border-radius: 50%;
+    background-color: var(--warning-color);
+}
+.ior-game-area .green-light { background-color: var(--success-color) !important; }
+
+/* --- Digit Span Game --- */
+.dst-game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+.turn-display {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    min-height: 1.5em;
+    margin-bottom: 15px;
+}
+.central-circle {
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+.digit-display {
+    font-size: 6.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+.feedback-icon {
+    position: absolute;
+    font-size: 3rem;
+    display: none;
+}
+.feedback-icon.correct { color: var(--success-color); }
+.feedback-icon.incorrect { color: var(--danger-color); }
+
+.user-sequence-display {
+    margin-top: 15px;
+    font-size: 1.8rem;
+    color: var(--secondary-color);
+    min-height: 1.5em;
+    letter-spacing: 0.2em;
+    direction: ltr;
+}
+.digit-span-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    margin: 20px auto 0;
+}
+.digit-span-buttons .game-button {
+    width: 100%;
+    height: 60px;
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0;
+}
+.digit-span-buttons .control-btn.clear-btn { background-color: var(--warning-color); }
+.digit-span-buttons .control-btn.submit-btn { background-color: var(--success-color); }
+
+
+/* A general fixed container for buttons at the bottom */
+.fixed-bottom-controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 5px;
+    box-sizing: border-box;
+    background: var(--background-color);
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    z-index: 500;
+}
+.fixed-bottom-controls .game-button {
+    width: 48%;
+    margin: 0;
+}
+
+/* --- Phase Transition Overlay --- */
+.phase-transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 33, 71, 0.95);
+    color: white;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+    text-align: center;
+    padding: 20px;
+}
+.phase-transition-overlay h2 {
+    color: white;
+    font-size: 2.2em;
+}
+.phase-transition-overlay p {
+    font-size: 1.2em;
+    margin-bottom: 25px;
+}
+.phase-transition-overlay .button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+.phase-transition-overlay .game-button.secondary {
+    background-color: var(--disabled-color);
+}
+
+/* --- EHC Games --- */
+.ehc-fupd-game-area, .ehc-mud-game-area {
+    width: 100%;
+    max-width: min(90vw, 65vh, 500px);
+    aspect-ratio: 1 / 1;
+    position: relative;
+    margin: auto;
+}
+.ehc-fupd-game-area #track {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.track-outer {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 2;
+}
+.track-inner {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 2;
+    stroke-dasharray: 5 5;
+}
+.ball {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    transition: background-color 0.1s;
+}
+.ball.white { background-color: #ffffff; border: 2px solid var(--success-color); }
+.ball.orange { background-color: var(--warning-color); }
+.ball.red { background-color: var(--danger-color); }
+
+.rotate-prompt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 33, 71, 0.95);
+    color: white;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    text-align: center;
+}
+.rotate-prompt svg {
+    width: 80px;
+    height: 80px;
+    fill: white;
+    animation: rotate-anim 1.5s infinite linear;
+}
+@keyframes rotate-anim {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(90deg); }
+}
+
+/* --- Touch Marker for EHC Games --- */
+#touch-marker {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    z-index: 1000;
+
+    transform: translate(-50%, -50%);
+}
+
+#touch-marker::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: rgba(0, 0, 0, 0.7);
+    transform: translateY(-50%);
+}
+
+#touch-marker::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    transform: translateX(-50%);
+}
+
+/* --- RTL Support --- */
+[dir="rtl"] .progress-text {
+    right: auto;
+    left: 10px;
+}
+[dir="rtl"] .back-button svg {
+    transform: scaleX(-1);
+}
+
+/* --- PVT Game Styles --- */
+/* PVT Game Area uses absolute positioning for stimuli, hence needs relative context */
+.pvt-game-area {
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1 / 1;
+    position: relative; /* Crucial for absolute positioning of stimuli */
+    margin: 20px auto;
+}
+.pvt-stimulus {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+}
+.pvt-circle {
+    border-radius: 50%;
+    background-color: var(--secondary-color); /* Blue circle (Target) */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.pvt-hexagon {
+    /* Simple hexagon representation for distractor (optional) */
+    background-color: var(--secondary-color);
+    clip-path: polygon(50% 0%, 90% 20%, 90% 80%, 50% 100%, 10% 80%, 10% 20%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* --- VWM Game Styles (Specific to this game) --- */
+.vwm-game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    width: 100%;
+}
+
+/* Delay Overlay Styling (Memorize! message) */
+.delay-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 33, 71, 0.95);
+    color: white;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.delay-overlay h2 {
+    color: white;
+    font-size: 3em;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Container for the 10 circles array */
+.circles-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px; /* Gap between circles */
+    width: 100%;
+    max-width: 600px; /* Increased max-width for larger circles */
+    padding: 20px;
+    margin: 20px auto;
+    background-color: #e9ecef;
+    border-radius: 15px; /* Softer corners */
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
+/* Style for individual memory circles */
+/* Style for individual memory circles */
+.vwm-circle {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 3px solid #ced4da;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1),
+                box-shadow 0.2s cubic-bezier(0.25, 0.1, 0.25, 1),
+                background-color 0.15s ease-in-out;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* Interactive effects for hover and click */
+.vwm-circle:hover:not(:disabled) {
+    transform: translateY(-5px) scale(1.05); /* Lifts the circle on hover */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Enhances shadow on hover */
+}
+
+.vwm-circle:active:not(:disabled) {
+    transform: translateY(-2px) scale(0.98); /* "Pressed down" effect */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.vwm-circle:disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Keyframes for a pulsing glow animation when a circle lights up */
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(255, 193, 7, 0.7);
+    }
+    70% {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1), 0 0 0 12px rgba(255, 193, 7, 0);
+    }
+    100% {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(255, 193, 7, 0);
+    }
+}
+
+/* Styling for different circle states */
+.vwm-circle.lit {
+    background-color: var(--warning-color);
+    border-color: #ffac33;
+    animation: pulse-glow 1.5s infinite; /* Attention-grabbing glow */
+}
+
+.vwm-circle.correct {
+    background-color: var(--success-color); /* Green for correct feedback */
+    border-color: #208a38;
+}
+
+.vwm-circle.incorrect {
+    background-color: var(--danger-color); /* Red for incorrect feedback */
+    border-color: #b22a38;
+    /* Shaking animation for incorrect feedback */
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Shaking animation for incorrect clicks */
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+
+/* --- Visual Memory Test (VMT) Styles --- */
+.vmt-game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    flex-grow: 1;
+    min-height: 400px;
+    padding: 20px;
+}
+
+/* Model Turn: Central Display */
+.vmt-model-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    max-width: 500px;
+    min-height: 150px;
+    margin: 20px auto;
+}
+.vmt-trio-rectangle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border: 2px solid var(--primary-color);
+    background-color: white;
+    border-radius: 8px;
+}
+
+/* --- IMAGE SIZING FIX FOR VMT STARTS HERE --- */
+
+/* Base style for the containers (divs) that will hold the images */
+.vmt-object, .vmt-object-small {
+    background-color: #f0f2f5; /* A light background for the container "card" */
+    border: 1px solid #ddd;      /* A subtle border */
+    border-radius: 8px;          /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* A soft shadow for depth */
+    display: flex;               /* To center the image inside */
+    justify-content: center;
+    align-items: center;
+    padding: 5px;                /* A small inner margin for the image */
+    box-sizing: border-box;      /* Ensures padding is included in the total size */
+    overflow: hidden;            /* Prevents image from overflowing the container */
+}
+
+/* A responsive size for the image containers in the main "model" display */
+.vmt-object {
+    width: 28%;          /* Use a percentage for responsive width */
+    height: auto;        /* Let aspect-ratio handle the height */
+    aspect-ratio: 1 / 1; /* Ensure the container is always square */
+}
+
+/* This rule targets the actual <img> tag INSIDE the model containers */
+.vmt-object img {
+    max-width: 100%;    /* The image cannot be wider than its container */
+    max-height: 100%;   /* The image cannot be taller than its container */
+    object-fit: contain;/* This crucial property scales the image down to fit, preserving its aspect ratio */
+}
+
+/* A smaller responsive size for the image containers in the user "options" display */
+.vmt-object-small {
+    width: 28%;          /* Use a percentage for responsive width */
+    height: auto;        /* Let aspect-ratio handle the height */
+    aspect-ratio: 1 / 1; /* Ensure the container is always square */
+}
+
+/* This rule targets the actual <img> tag INSIDE the options containers */
+.vmt-object-small img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* --- IMAGE SIZING FIX FOR VMT ENDS HERE --- */
+
+
+/* User Turn: Four Quadrant Options */
+.vmt-options-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+}
+
+.vmt-option {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 3px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+.vmt-option:hover {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 10px rgba(0, 119, 190, 0.5);
+}
+
+.vmt-option .vmt-option-rect {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Feedback Styles */
+.vmt-option.correct-choice {
+    background-color: var(--success-color); /* Changed to solid green for better visual feedback */
+    border-color: var(--success-color);
+}
+.vmt-option.incorrect-choice {
+    background-color: var(--danger-color); /* Changed to solid red for better visual feedback */
+    border-color: var(--danger-color);
+}
+.vmt-option.correct-answer {
+    animation: pulse-correct 1s infinite;
+}
+@keyframes pulse-correct {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+
+/* --- Selective Attention Test (SAT) Styles --- */
+/* --- MODIFICATION FOR SAT STARTS HERE --- */
+.sat-game-area { display: flex; flex-direction: column; align-items: center; flex-grow: 1; padding: 10px 0; width: 100%; }
+.info-header { display: flex; justify-content: space-around; width: 100%; max-width: 500px; margin-bottom: 20px; font-weight: bold; color: var(--primary-color); background-color: #e9ecef; padding: 10px 15px; border-radius: 8px; }
+#target-definition-overlay h2, #target-definition-overlay p { color: white !important; }
+
+.sat-target-display {
+    display: flex; justify-content: center; align-items: center; width: 150px; height: 150px;
+    background-color: #e9ecef; /* Light gray background for the container */
+    border-radius: 12px; padding: 10px; box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); margin-bottom: 20px;
+}
+.stimuli-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 100%; max-width: 500px; margin: 0 auto 20px; }
+.stimulus-item { display: flex; justify-content: center; align-items: center; cursor: pointer; background-color: #ffffff; border: 2px solid #ced4da; border-radius: 8px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; aspect-ratio: 1 / 1; padding: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
+.stimulus-item:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.12); }
+.stimulus-item.selected { border-color: var(--secondary-color); box-shadow: 0 0 0 3px var(--secondary-color), inset 0 2px 4px rgba(0,0,0,0.1); background-color: #e7f5ff; }
+.stimulus-item.missed { border: 3px solid var(--danger-color); background-color: #fbebed; }
+.stimulus-item.false-alarm { border: 3px solid var(--danger-color); animation: flash-red 0.5s 2; }
+@keyframes flash-red { 50% { background-color: #f8d7da; } }
+
+/* --- MODIFICATION FOR SAT ENDS HERE --- */
+
+
+/* --- Maze Game Styles --- */
+.maze-game-area {
+    width: 100%;
+    max-width: 550px;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    margin: 20px auto;
+    display: grid; /* Grid container for better wall placement */
+    overflow: hidden; /* Hide excess walls */
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+#maze-grid {
+    display: grid;
+    width: 100%;
+    height: 100%;
+}
+.maze-cell {
+    position: relative;
+}
+.wall-top { border-top: 2px solid var(--primary-color); }
+.wall-right { border-right: 2px solid var(--primary-color); }
+.wall-bottom { border-bottom: 2px solid var(--primary-color); }
+.wall-left { border-left: 2px solid var(--primary-color); }
+
+#interactive-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allows clicks to pass through to the move elements */
+}
+.maze-player {
+    position: absolute;
+    background-color: #ff8c00; /* Orange start circle */
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    transition: transform 0.2s ease-in-out;
+}
+.maze-goal {
+    position: absolute;
+    display: flex; /* Needed to center the star ::after */
+    justify-content: center; /* Center star horizontally */
+    align-items: center; /* Center star vertically */
+    background-color: #4CAF50; /* Green goal */
+    /* border-radius is now set by JavaScript */
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    transition: width 0.2s ease-in-out, height 0.2s ease-in-out, border-radius 0.2s ease-in-out; /* Added border-radius transition */
+}
+.maze-goal::after {
+    content: '★';
+    font-size: 2.5em; /* Keep star size relative */
+    color: white;
+    /* Ensure star stays centered even if goal size changes */
+    line-height: 1; /* Helps centering */
+}
+.maze-possible-move {
+    position: absolute;
+    background-color: white; /* Hollow circle/dot to click */
+    border: 2px solid var(--secondary-color);
+    border-radius: 50%;
+    opacity: 0.8;
+    cursor: pointer;
+    pointer-events: auto; /* Re-enable clicks for this element */
+    transition: background-color 0.1s;
+}
+.maze-possible-move:hover {
+    background-color: var(--secondary-color);
+    opacity: 1;
+}
+
+.info-footer {
+    display: flex;
+    justify-content: space-around;
+    width: 90%;
+    max-width: 500px;
+    margin: 20px auto;
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 10px;
+    background-color: #f0f8ff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+/* ADD THIS TO THE END OF YOUR style.css FILE */
+
+/* ======================================================= */
+/* === 3. MEDIA QUERY FOR LARGER SCREENS (DESKTOP) === */
+/* ======================================================= */
+
+@media (min-width: 768px) {
+    body {
+        padding: 40px 20px;
+    }
+    .container, .game-container {
+        min-height: auto;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin: 20px auto;
+    }
+    .game-button, .back-button {
+        display: inline-block;
+        width: auto;
+        margin: 10px 5px;
+    }
+    .game-list .game-button {
+        width: 80%;
+        max-width: 350px;
+    }
+    .back-button {
+        /* Keep centered using auto margins for larger screens */
+        margin: 20px auto;
+    }
+
+    /* --- Game Selection (Desktop) --- */
+    .progress-tracker {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        position: relative;
+    }
+    .step-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2;
+    }
+    .step {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: white;
+        border: 2px solid var(--line-color);
+        color: var(--line-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    .step.completed {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+        color: white;
+    }
+    .step-line {
+        flex-grow: 1;
+        height: 2px;
+        background-color: var(--line-color);
+        margin: 0 -2px;
+        position: relative;
+        z-index: 1;
+    }
+    .tooltip-text {
+        visibility: hidden;
+        width: 180px;
+        background-color: var(--primary-color);
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 8px 10px;
+        position: absolute;
+        z-index: 10;
+        bottom: 150%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 14px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .tooltip-text::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 6px;
+        border-style: solid;
+        border-color: var(--primary-color) transparent transparent transparent;
+    }
+    .step-container:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
+
+
+    /* --- IOR Game (Desktop) --- */
+    .ior-game-area {
+        height: 250px; /* Fixed height for desktop */
+        justify-content: space-around; /* More space on desktop */
+    }
+    /* Make buttons static on desktop */
+    .fixed-bottom-controls {
+        position: static;
+        box-shadow: none;
+        padding: 0;
+        margin-top: 20px;
+        background: transparent;
+        display: flex;
+        justify-content: center;
+    }
+    .fixed-bottom-controls .game-button {
+        width: 150px;
+    }
+
+    /* --- Digit Span (Desktop) --- */
+    .dst-game-area {
+      flex-grow: 0;
+    }
+
+    /* --- VWM Desktop Adjustments (Specific to this game) --- */
+    /* Container for the 10 circles array */
+    .circles-container {
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+        margin: 20px auto;
+        background-color: #e9ecef;
+        border-radius: 15px;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        box-sizing: border-box;
+
+        position: relative;
+        aspect-ratio: 1.5 / 1;
+        min-height: 350px;
+        overflow: hidden;
+    }
+}
+
+
+.distraction-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px; /* Spacing from the "Memorize!" text */
+}
+
+/* Style for each individual dot */
+.loader-dot {
+    width: 25px;           /* Dot size */
+    height: 25px;
+    border-radius: 50%;
+    background-color: #f0f8ff; /* Dot color (AliceBlue) */
+    margin: 0 12px;        /* Horizontal spacing between dots */
+    opacity: 0.4;          /* Start in a dim state */
+
+    /* Apply animation */
+    animation-name: dot-glow;
+    animation-duration: 1.6s;
+    animation-iteration-count: infinite;
+}
+
+/* Animation delays for sequential effect:
+   The animation is 1.6s long. By dividing by 4 (number of dots),
+   we give each dot a 0.4s delay to light up one after another.
+*/
+.loader-dot:nth-child(1) { animation-delay: 0s; }
+.loader-dot:nth-child(2) { animation-delay: 0.4s; }
+.loader-dot:nth-child(3) { animation-delay: 0.8s; }
+.loader-dot:nth-child(4) { animation-delay: 1.2s; }
+
+
+/* Definition of the glow (on/off) animation */
+@keyframes dot-glow {
+    0%   {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+    25%  {
+        opacity: 1;   /* Lights up (bright) */
+        transform: scale(1.1); /* Gets slightly larger */
+    }
+    50%  {
+        opacity: 0.4; /* Fades out */
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0.4; /* Stays faded out */
+    }
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" {% if lang == 'fa' %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ strings.VMT }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        window.LANG = "{{ lang }}";
+        window.STRINGS = {{ strings|tojson }};
+    </script>
+</head>
+<body>
+
+    <div id="phase-transition-overlay" class="phase-transition-overlay">
+        <h2>{{ strings.practice_over_title }}</h2>
+        <p>{{ strings.get_ready_for_main_test }}</p>
+        <div class="button-group">
+            <button id="practice-again-btn" class="game-button secondary">{{ strings.practice_again_button }}</button>
+            <button id="start-main-game-btn" class="game-button">{{ strings.start_main_game_button }}</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <h1 id="game-title">{{ strings.VMT }}</h1>
+
+        <div class="progress-bar-container" style="display: none;">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+            <span id="progressText" class="progress-text"></span>
+        </div>
+
+        <div id="instructions-screen">
+            <h2>{{ strings.vmt_instructions_title }}</h2>
+            <p>{{ strings.vmt_instructions_line1 }}</p>
+            <p>{{ strings.vmt_instructions_line2 }}</p>
+            <p>{{ strings.vmt_instructions_line3 }}</p>
+            <button id="start-practice-btn" class="game-button">{{ strings.start_practice_button }}</button>
+        </div>
+
+        <div id="game-area" class="vmt-game-area" style="display: none;">
+            <div id="turn-display" class="turn-display"></div>
+
+            <div id="model-display" class="vmt-model-display">
+                </div>
+
+            <div id="options-container" class="vmt-options-container">
+                </div>
+        </div>
+
+        <div id="end-game-screen" style="display: none;">
+             <div id="message-display-end" class="message"></div>
+             </div>
+
+        <div id="message-display" class="message"></div>
+
+        <a href="{{ url_for('select_game', lang=lang) }}" class="back-button" id="static-back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            <span>{{ strings.back_to_selection }}</span>
+        </a>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/visual_memory_test_game.js') }}"></script>
+</body>
+</html>

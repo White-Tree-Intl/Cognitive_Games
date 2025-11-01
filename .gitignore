@@ -1,0 +1,18 @@
+# Virtual Environment
+.venv
+venv/
+*.pyc
+
+# Python cache
+__pycache__/
+
+# Editor/OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Instance folder (if you have secrets)
+instance/
+
+# Environment variables
+.env

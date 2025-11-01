@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" {% if lang == 'fa' %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ strings.IOR }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        window.LANG = "{{ lang }}";
+        window.STRINGS = {{ strings|tojson }};
+    </script>
+</head>
+<body>
+
+    <!-- This div is for the message between practice and main game -->
+    <div id="phase-transition-overlay" class="phase-transition-overlay">
+        <h2>{{ strings.practice_over_title }}</h2>
+        <div class="button-group">
+            <button id="practice-again-btn" class="game-button secondary">{{ strings.practice_again_button }}</button>
+            <button id="start-main-game-btn" class="game-button">{{ strings.start_main_game_button }}</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <h1 id="game-title">{{ strings.IOR }}</h1>
+
+        <!-- Progress Bar for Trials -->
+        <div class="progress-bar-container" style="display: none;">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+            <span id="progressText" class="progress-text"></span>
+        </div>
+
+        <!-- Instructions Screen -->
+        <div id="instructions-screen">
+            <h2>{{ strings.ior_instructions_title }}</h2>
+            <p>{{ strings.ior_instructions_line1 }}</p>
+            <p>{{ strings.ior_instructions_line2 | default('A yellow dot will appear first as a cue. Do NOT react to the yellow dot.', true) }}</p>
+            <p>{{ strings.ior_instructions_line3 | default('Only press the button for the side where the GREEN light appears.', true) }}</p>
+            <button id="start-practice-btn" class="game-button">{{ strings.start_practice_button }}</button>
+        </div>
+
+        <!-- Game Area (hidden initially) -->
+        <div id="game-area" class="ior-game-area" style="display: none;">
+            <div id="left-circle" class="ior-circle"></div>
+            <div id="fixation-point" class="fixation-point"></div>
+            <div id="right-circle" class="ior-circle"></div>
+        </div>
+
+        <!-- Response Buttons (fixed at bottom for mobile) -->
+        <div id="response-buttons" class="fixed-bottom-controls" style="display: none;">
+            <button id="left-button" class="game-button">{{ strings.left_button }}</button>
+            <button id="right-button" class="game-button">{{ strings.right_button }}</button>
+        </div>
+
+        <!-- Message Display Area -->
+        <div id="message-display" class="message"></div>
+
+        <a href="{{ url_for('select_game', lang=lang) }}" class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            <span>{{ strings.back_to_selection }}</span>
+        </a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/ior_game.js') }}"></script>
+</body>
+</html>

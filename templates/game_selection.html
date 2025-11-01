@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" {% if lang == 'fa' %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ strings.select_game_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        window.LANG = "{{ lang }}";
+        window.STRINGS = {{ strings|tojson }};
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>{{ strings.select_game_title }}</h1>
+
+        <!-- Visual Progress Tracker -->
+        <div class="progress-tracker">
+            {% for game in games %}
+            <div class="step-container" data-acronym="{{ game.acronym }}">
+                <div class="step">{{ loop.index }}</div>
+                <span class="tooltip-text">{{ strings[game.acronym] }}</span>
+            </div>
+            {% if not loop.last %}
+            <div class="step-line"></div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Game List -->
+        <ul class="game-list">
+            {% for game in games %}
+            <li>
+                <a href="{{ game.url }}?lang={{ lang }}" class="game-button" data-acronym="{{ game.acronym }}">
+                    {{ strings[game.acronym] }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Language Switcher -->
+        <div class="lang-switcher">
+            <a href="{{ url_for('select_game', lang='en') }}">English</a> |
+            <a href="{{ url_for('select_game', lang='fa') }}">فارسی</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get the list of completed games from the browser's local storage.
+            const completedGames = JSON.parse(localStorage.getItem('completedGames')) || [];
+
+            // Update the progress tracker steps.
+            const steps = document.querySelectorAll('.step-container');
+            steps.forEach(step => {
+                const acronym = step.dataset.acronym;
+                if (completedGames.includes(acronym)) {
+                    step.querySelector('.step').classList.add('completed');
+                }
+            });
+
+            // Update the game buttons.
+            const gameButtons = document.querySelectorAll('.game-button');
+            gameButtons.forEach(button => {
+                const acronym = button.dataset.acronym;
+                if (completedGames.includes(acronym)) {
+                    button.classList.add('completed');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

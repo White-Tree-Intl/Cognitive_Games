@@ -1,7 +1,6 @@
 // static/js/selective_attention_game.js
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
-    const instructionsScreen = document.getElementById('instructions-screen');
     const startPhaseBtn = document.getElementById('start-phase-btn');
     const startMainGameBtn = document.getElementById('start-main-game-btn');
     const practiceAgainBtn = document.getElementById('practice-again-btn');
@@ -20,13 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageDisplayEnd = document.getElementById('message-display-end');
 
     // --- Game Configuration ---
+    // === MODIFICATION START ===
+    // 'distractors' for Testing changed from 6 to 15 to make a 25-item grid (10 + 15).
     const TRIALS_CONFIG = {
-        Practice: { count: 1, targets: 5, distractors: 11, timeout: 60000 },
-        Testing: { count: 5, targets: 10, distractors: 6, timeout: 30000 }
+        Practice: { count: 1, targets: 5, distractors: 11, timeout: 60000 }, // Total 16
+        Testing: { count: 5, targets: 10, distractors: 15, timeout: 30000 }  // Total 25
     };
-    const GRID_SIZE = 16;
+    // Removed global GRID_SIZE constant, as it's now derived from targets + distractors.
+    // === MODIFICATION END ===
+
+    // --- NEW STIMULUS CONFIGURATION (Based on user rules) ---
     const ROTATIONS = [0, 90, 180, 270];
-    const TRIANGLE_COUNTS = [0, 1, 2];
+    const QUADRANTS = ['top', 'right', 'bottom', 'left'];
+    const TRIANGLE_COUNTS = [0, 1, 2, 3];
+    const DIRECTIONS = ['up', 'down'];
 
     // --- Game State ---
     let isPractice = true;
@@ -54,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startPhase(true);
     });
     stimuliGrid.addEventListener('click', handleStimulusClick);
-    confirmButton.addEventListener('click', handleConfirm); // This was the missing line
+    confirmButton.addEventListener('click', handleConfirm);
 
     // --- Initialization ---
     function initializeGame() {
@@ -71,10 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function defineTarget() {
         targetStimulus = {
             rotation: ROTATIONS[Math.floor(Math.random() * ROTATIONS.length)],
-            triangleCount: TRIANGLE_COUNTS[Math.floor(Math.random() * TRIANGLE_COUNTS.length)]
+            missingQuadrant: QUADRANTS[Math.floor(Math.random() * QUADRANTS.length)],
+            topTriangleCount: TRIANGLE_COUNTS[Math.floor(Math.random() * TRIANGLE_COUNTS.length)],
+            bottomTriangleCount: TRIANGLE_COUNTS[Math.floor(Math.random() * TRIANGLE_COUNTS.length)],
+            topTriangleDir: DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)],
+            bottomTriangleDir: DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)]
         };
+
         targetDisplay.style.backgroundColor = '#e9ecef';
-        targetDisplay.innerHTML = createStimulusSVG(targetStimulus.rotation, targetStimulus.triangleCount);
+        targetDisplay.innerHTML = createStimulusSVG(targetStimulus);
     }
 
     // --- Game Flow ---
@@ -104,6 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
         updateHeader();
 
         const config = isPractice ? TRIALS_CONFIG.Practice : TRIALS_CONFIG.Testing;
+
+        // === MODIFICATION START ===
+        // Add/Remove class for dynamic grid layout (4x4 vs 5x5)
+        if (isPractice) {
+            stimuliGrid.classList.remove('grid-5x5');
+            stimuliGrid.classList.add('grid-4x4');
+        } else {
+            stimuliGrid.classList.remove('grid-4x4');
+            stimuliGrid.classList.add('grid-5x5');
+        }
+        // === MODIFICATION END ===
+
         trialStimuli = generateTrialStimuli(targetStimulus, config.targets, config.distractors);
         renderStimuli();
 
@@ -178,7 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!isPractice) {
             completionTime += reactionTime;
-            allTrialData.push({ isCorrect: isTrialCorrect, omissionErrors, commissionErrors, targetCount, distractorCount: GRID_SIZE - targetCount });
+            // === MODIFICATION START ===
+            // Calculate distractorCount dynamically instead of using a global GRID_SIZE
+            const distractorCount = trialStimuli.length - targetCount;
+            allTrialData.push({ isCorrect: isTrialCorrect, omissionErrors, commissionErrors, targetCount, distractorCount: distractorCount });
+            // === MODIFICATION END ===
         }
 
         setTimeout(() => {
@@ -210,16 +237,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generateTrialStimuli(target, targetCount, distractorCount) {
         let stimuli = [];
-        for (let i = 0; i < GRID_SIZE; i++) {
+        // === MODIFICATION START ===
+        // Loop based on sum of targets + distractors, not a global GRID_SIZE
+        const localGridSize = targetCount + distractorCount;
+        for (let i = 0; i < localGridSize; i++) {
+        // === MODIFICATION END ===
             if (i < targetCount) {
                 stimuli.push({ ...target, isTarget: true });
             } else {
-                let distractorRotation, distractorTriangleCount;
+                let distractor;
                 do {
-                    distractorRotation = ROTATIONS[Math.floor(Math.random() * ROTATIONS.length)];
-                    distractorTriangleCount = TRIANGLE_COUNTS[Math.floor(Math.random() * TRIANGLE_COUNTS.length)];
-                } while (distractorRotation === target.rotation && distractorTriangleCount === target.triangleCount);
-                stimuli.push({ rotation: distractorRotation, triangleCount: distractorTriangleCount, isTarget: false });
+                    distractor = {
+                        rotation: ROTATIONS[Math.floor(Math.random() * ROTATIONS.length)],
+                        missingQuadrant: QUADRANTS[Math.floor(Math.random() * QUADRANTS.length)],
+                        topTriangleCount: TRIANGLE_COUNTS[Math.floor(Math.random() * TRIANGLE_COUNTS.length)],
+                        bottomTriangleCount: TRIANGLE_COUNTS[Math.floor(Math.random() * TRIANGLE_COUNTS.length)],
+                        topTriangleDir: DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)],
+                        bottomTriangleDir: DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)]
+                    };
+                } while (
+                    distractor.rotation === target.rotation &&
+                    distractor.missingQuadrant === target.missingQuadrant &&
+                    distractor.topTriangleCount === target.topTriangleCount &&
+                    distractor.bottomTriangleCount === target.bottomTriangleCount &&
+                    distractor.topTriangleDir === target.topTriangleDir &&
+                    distractor.bottomTriangleDir === target.bottomTriangleDir
+                );
+                stimuli.push({ ...distractor, isTarget: false });
             }
         }
         return shuffle(stimuli);
@@ -231,22 +275,67 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = document.createElement('div');
             item.className = 'stimulus-item';
             item.dataset.index = index;
-            item.innerHTML = createStimulusSVG(stimulus.rotation, stimulus.triangleCount);
+            item.innerHTML = createStimulusSVG(stimulus);
             stimuliGrid.appendChild(item);
         });
     }
 
-    function createStimulusSVG(rotation, triangleCount) {
-        const centralPolygonPoints = '50,30 95,50 50,85 5,50';
-        const TRIANGLE_UP_Y = 15;
-        const TRIANGLE_DOWN_Y = 85;
-        const triangle1 = `<polygon points="40,${TRIANGLE_UP_Y} 50,${TRIANGLE_UP_Y - 5} 60,${TRIANGLE_UP_Y}" fill="#002147" />`;
-        const triangle2 = `<polygon points="40,${TRIANGLE_DOWN_Y} 50,${TRIANGLE_DOWN_Y + 5} 60,${TRIANGLE_DOWN_Y}" fill="#002147" />`;
-        let triangles = '';
-        if (triangleCount === 1) triangles = triangle1;
-        else if (triangleCount === 2) triangles = triangle1 + triangle2;
-        const mainShapeFill = '#ffffff';
-        return `<svg viewBox="0 0 100 100" width="100%" height="100%"><g transform="rotate(${rotation} 50 50)"><polygon points="${centralPolygonPoints}" stroke="#333" stroke-width="3" fill="${mainShapeFill}" /></g>${triangles}</svg>`;
+    function createStimulusSVG(stimulus) {
+        const { rotation, missingQuadrant, topTriangleCount, bottomTriangleCount, topTriangleDir, bottomTriangleDir } = stimulus;
+        const mainFill = '#002147';
+        const mainStroke = '#333';
+        const mainStrokeWidth = 2;
+
+        const rhombusTriangles = {
+            top:    `<polygon points="50,20 80,50 50,50" fill="${mainFill}" stroke="${mainStroke}" stroke-width="${mainStrokeWidth}" stroke-linejoin="round" />`,
+            right:  `<polygon points="80,50 50,80 50,50" fill="${mainFill}" stroke="${mainStroke}" stroke-width="${mainStrokeWidth}" stroke-linejoin="round" />`,
+            bottom: `<polygon points="50,80 20,50 50,50" fill="${mainFill}" stroke="${mainStroke}" stroke-width="${mainStrokeWidth}" stroke-linejoin="round" />`,
+            left:   `<polygon points="20,50 50,20 50,50" fill="${mainFill}" stroke="${mainStroke}" stroke-width="${mainStrokeWidth}" stroke-linejoin="round" />`
+        };
+
+        let rhombusSVG = '';
+        if (missingQuadrant !== 'top') rhombusSVG += rhombusTriangles.top;
+        if (missingQuadrant !== 'right') rhombusSVG += rhombusTriangles.right;
+        if (missingQuadrant !== 'bottom') rhombusSVG += rhombusTriangles.bottom;
+        if (missingQuadrant !== 'left') rhombusSVG += rhombusTriangles.left;
+
+        rhombusSVG += `<polygon points="50,20 80,50 50,80 20,50" fill="none" stroke="${mainStroke}" stroke-width="${mainStrokeWidth}" />`;
+
+        let smallTrianglesSVG = '';
+        const TRIANGLE_Y_TOP_BASE = 10;
+        const TRIANGLE_Y_BOTTOM_BASE = 85;
+        const TRIANGLE_SIZE = 5;
+        const TRIANGLE_WIDTH = 8;
+        const TRIANGLE_FILL = '#333';
+
+        const createSmallTriangle = (x, y_base, direction) => {
+            const y_point = (direction === 'up') ? y_base - TRIANGLE_SIZE : y_base + TRIANGLE_SIZE;
+            return `<polygon points="${x - TRIANGLE_WIDTH/2},${y_base} ${x + TRIANGLE_WIDTH/2},${y_base} ${x},${y_point}" fill="${TRIANGLE_FILL}" />`;
+        };
+
+        const topPositions = [35, 50, 65];
+        const bottomPositions = [35, 50, 65];
+
+        if (topTriangleCount === 1) {
+            smallTrianglesSVG += createSmallTriangle(topPositions[1], TRIANGLE_Y_TOP_BASE, topTriangleDir);
+        } else if (topTriangleCount === 2) {
+            smallTrianglesSVG += createSmallTriangle(topPositions[0], TRIANGLE_Y_TOP_BASE, topTriangleDir);
+            smallTrianglesSVG += createSmallTriangle(topPositions[2], TRIANGLE_Y_TOP_BASE, topTriangleDir);
+        } else if (topTriangleCount === 3) {
+            topPositions.forEach(x => { smallTrianglesSVG += createSmallTriangle(x, TRIANGLE_Y_TOP_BASE, topTriangleDir); });
+        }
+
+        if (bottomTriangleCount === 1) {
+            smallTrianglesSVG += createSmallTriangle(bottomPositions[1], TRIANGLE_Y_BOTTOM_BASE, bottomTriangleDir);
+        } else if (bottomTriangleCount === 2) {
+            smallTrianglesSVG += createSmallTriangle(bottomPositions[0], TRIANGLE_Y_BOTTOM_BASE, bottomTriangleDir);
+            smallTrianglesSVG += createSmallTriangle(bottomPositions[2], TRIANGLE_Y_BOTTOM_BASE, bottomTriangleDir);
+        } else if (bottomTriangleCount === 3) {
+            bottomPositions.forEach(x => { smallTrianglesSVG += createSmallTriangle(x, TRIANGLE_Y_BOTTOM_BASE, bottomTriangleDir); });
+        }
+
+        const rotatedRhombus = `<g transform="rotate(${rotation} 50 50)">${rhombusSVG}</g>`;
+        return `<svg viewBox="0 0 100 100" width="100%" height="100%">${rotatedRhombus}${smallTrianglesSVG}</svg>`;
     }
 
     function shuffle(array) {
@@ -277,5 +366,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return results;
     }
 
+    // --- Start the game ---
     initializeGame();
 });

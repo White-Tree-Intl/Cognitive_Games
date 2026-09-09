@@ -1,75 +1,137 @@
 <!DOCTYPE html>
 <html lang="{{ lang }}" {% if lang == 'fa' %}dir="rtl"{% endif %}>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ strings.select_game_title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script>
-        window.LANG = "{{ lang }}";
-        window.STRINGS = {{ strings|tojson }};
-    </script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{{ strings.select_game_title }}</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<script>
+window.LANG = "{{ lang }}";
+window.STRINGS = {{ strings | tojson | safe }};
+</script>
+
 </head>
+
 <body>
 
-    <div class="container">
-        <h1>{{ strings.select_game_title }}</h1>
+<div class="container">
 
-        <!-- Visual Progress Tracker -->
-        <div class="progress-tracker">
-            {% for game in games %}
-            <div class="step-container" data-acronym="{{ game.acronym }}">
-                <div class="step">{{ loop.index }}</div>
-                <span class="tooltip-text">{{ strings[game.acronym] }}</span>
-            </div>
-            {% if not loop.last %}
-            <div class="step-line"></div>
-            {% endif %}
-            {% endfor %}
+    <h1>{{ strings.select_game_title }}</h1>
+
+    <!-- Progress Tracker -->
+    <div class="progress-tracker">
+
+        {% for game in games %}
+
+        <div class="step-container" data-acronym="{{ game.acronym }}">
+            <div class="step">{{ loop.index }}</div>
+            <span class="tooltip-text">
+                {{ strings[game.acronym] }}
+            </span>
         </div>
 
-        <!-- Game List -->
-        <ul class="game-list">
-            {% for game in games %}
-            <li>
-                <a href="{{ game.url }}?lang={{ lang }}" class="game-button" data-acronym="{{ game.acronym }}">
-                    {{ strings[game.acronym] }}
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
+        {% if not loop.last %}
+        <div class="step-line"></div>
+        {% endif %}
 
-        <!-- Language Switcher -->
-        <div class="lang-switcher">
-            <a href="{{ url_for('select_game', lang='en') }}">English</a> |
-            <a href="{{ url_for('select_game', lang='fa') }}">فارسی</a>
-        </div>
+        {% endfor %}
+
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Get the list of completed games from the browser's local storage.
-            const completedGames = JSON.parse(localStorage.getItem('completedGames')) || [];
 
-            // Update the progress tracker steps.
-            const steps = document.querySelectorAll('.step-container');
-            steps.forEach(step => {
-                const acronym = step.dataset.acronym;
-                if (completedGames.includes(acronym)) {
-                    step.querySelector('.step').classList.add('completed');
-                }
-            });
+    <!-- Game List -->
 
-            // Update the game buttons.
-            const gameButtons = document.querySelectorAll('.game-button');
-            gameButtons.forEach(button => {
-                const acronym = button.dataset.acronym;
-                if (completedGames.includes(acronym)) {
-                    button.classList.add('completed');
-                }
-            });
-        });
-    </script>
+    <ul class="game-list">
+
+        {% for game in games %}
+
+        <li>
+            <a 
+            href="{{ game.url }}?lang={{ lang }}"
+            class="game-button"
+            data-acronym="{{ game.acronym }}"
+            >
+            {{ strings[game.acronym] }}
+            </a>
+        </li>
+
+        {% endfor %}
+
+    </ul>
+
+    <!-- Export Results -->
+    <a href="{{ url_for('export_excel') }}" class="game-button export-button">
+        Export Excel
+    </a>
+
+    <!-- Logout Button -->
+    <div style="text-align:right; margin-bottom:20px;">
+        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+    </div>
+
+
+    <!-- Language Switcher -->
+
+    <div class="lang-switcher">
+
+        <a href="{{ url_for('select_game', lang='en') }}">English</a>
+        |
+        <a href="{{ url_for('select_game', lang='fa') }}">فارسی</a>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const completedFromDB = {{ completed_acronyms | tojson | safe }};
+
+    const steps = document.querySelectorAll(".step-container");
+
+    steps.forEach(function(step){
+
+        const acronym = step.dataset.acronym;
+
+        if(completedFromDB.includes(acronym)){
+
+            const circle = step.querySelector(".step");
+
+            if(circle){
+                circle.classList.add("completed");
+            }
+
+        }
+
+    });
+
+
+
+    const buttons = document.querySelectorAll(".game-button");
+
+    buttons.forEach(function(button){
+
+        const acronym = button.dataset.acronym;
+
+        if(completedFromDB.includes(acronym)){
+
+            button.classList.add("completed");
+
+        }
+
+    });
+
+});
+
+</script>
+
 
 </body>
 </html>

@@ -173,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             markerPos = { x: mousePos.x + touchOffset.x, y: mousePos.y + touchOffset.y };
 
             // Move the visual marker to the new offset position
+            touchMarker.style.left = '0px';
             touchMarker.style.transform = `translate(${markerPos.x}px, ${markerPos.y}px) translate(-50%, -50%)`;
 
         } else if (e.clientX) { // Check if it's a mouse event (e.clientX exists)
@@ -338,7 +339,6 @@ function runSegmentManager() {
 
         calculateAndSaveResults();
 
-        endGameScreen.querySelector('.message').textContent = window.STRINGS.task_finished_title;
         let completedGames = JSON.parse(localStorage.getItem('completedGames')) || [];
         if (!completedGames.includes('EHC-FUPD')) {
             completedGames.push('EHC-FUPD');
@@ -373,10 +373,51 @@ function runSegmentManager() {
         localStorage.setItem('gameData_EHC-FUPD', JSON.stringify(rawData));
         localStorage.setItem('gameResults_EHC-FUPD', JSON.stringify(finalResults));
         console.log("Final EHC-FUPD Results:", finalResults);
+        sendResultsToServer(finalResults);
+
     }
+
+    function sendResultsToServer(results) {
+
+        const variables = [
+            { name: "accuracy", value: results.accuracy },
+            { name: "accuracy_in_fast_speed", value: results.accuracy_in_fast_speed },
+            { name: "accuracy_in_slow_speed", value: results.accuracy_in_slow_speed },
+            { name: "accuracy_in_long_segments_duration", value: results.accuracy_in_long_segments_duration },
+            { name: "accuracy_in_short_segments_duration", value: results.accuracy_in_short_segments_duration },
+            { name: "distance_from_the_ball_center", value: results.distance_from_the_ball_center }
+        ];
+    
+        variables.forEach(v => {
+    
+            fetch("/save_result", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    task_name: "eye_hand_coordination_fupd",
+                    variable: v.name,
+                    value: v.value,
+    
+                    assessment_acronym: "EHC-FUPD",
+                    assessment_type: "cognitive_test",
+                    training_type: null,
+    
+                    device: navigator.userAgent
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log("Saved:", data))
+            .catch(err => console.error("Save error:", err));
+    
+        });
+    }
+    
 
     // --- UI Helper Functions ---
     function updateBallPosition() {
+        ball.style.left = '0px';
         ball.style.transform = `translate(${ballPos.x - BALL_RADIUS}px, ${ballPos.y - BALL_RADIUS}px)`;
     }
 

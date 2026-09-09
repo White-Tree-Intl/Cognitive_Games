@@ -175,7 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
         fixationPoint.style.visibility = 'hidden';
 
         if (isPractice) {
+            startMainGameBtn.disabled = true;
+            practiceAgainBtn.disabled = true;
             phaseOverlay.style.display = 'flex';
+            
+            setTimeout(() => {
+                startMainGameBtn.disabled = false;
+                practiceAgainBtn.disabled = false;
+            }, 500);
         } else {
             gameTitle.textContent = window.STRINGS.task_finished_title;
             calculateAndSaveResults();
@@ -216,6 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('gameData_IOR', JSON.stringify(allTrialData));
         localStorage.setItem('gameResults_IOR', JSON.stringify(finalResults));
         console.log("Final IOR Results:", finalResults);
+
+        sendResultsToServer(finalResults);
     }
 
 
@@ -243,4 +252,37 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBarFill.style.width = `${progress}%`;
         progressText.textContent = `${currentTrialIndex} / ${totalTrials}`;
     }
+
+    function sendResultsToServer(results) {
+        const variables = [
+            { name: "accuracy", value: results.accuracy },
+            { name: "accuracy_cued", value: results.accuracy_cued },
+            { name: "accuracy_uncued", value: results.accuracy_uncued },
+            { name: "response_time", value: results.response_time },
+            { name: "response_time_cued", value: results.response_time_cued },
+            { name: "response_time_uncued", value: results.response_time_uncued },
+            { name: "inhibition_of_return_effect_in_response_time", value: results.inhibition_of_return_effect_in_response_time },
+            { name: "omission_errors", value: results.omission_errors }
+        ];
+    
+        variables.forEach(v => {
+            fetch("/save_result", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    task_name: "inhibition_of_return",
+                    variable: v.name,
+                    value: v.value,
+                    assessment_acronym: "IOR",
+                    assessment_type: "cognitive_test",
+                    training_type: null,
+                    device: navigator.userAgent
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log(`Saved ${v.name}:`, data))
+            .catch(err => console.error(`Save error ${v.name}:`, err));
+        });
+    }
+    
 });

@@ -48,7 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let countdownInterval;
 
     // --- Event Listeners ---
-    startPhaseBtn.addEventListener('click', startPhase);
+    startPhaseBtn.addEventListener('click', () => startPhase());
+    
     startMainGameBtn.addEventListener('click', () => {
         phaseTransitionOverlay.style.display = 'none';
         isPractice = false;
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Game Flow ---
-    function startPhase(isPracticeOverride = null) {
+    function startPhase(isPracticeOverride = null) {        
         if (isPracticeOverride !== null) {
             isPractice = isPracticeOverride;
         }
@@ -201,20 +202,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!isPractice) {
             completionTime += reactionTime;
-            // === MODIFICATION START ===
-            // Calculate distractorCount dynamically instead of using a global GRID_SIZE
             const distractorCount = trialStimuli.length - targetCount;
             allTrialData.push({ isCorrect: isTrialCorrect, omissionErrors, commissionErrors, targetCount, distractorCount: distractorCount });
-            // === MODIFICATION END ===
         }
 
         setTimeout(() => {
-            if (currentTrial >= totalTrials) {
-                endPhase();
-            } else {
+            if (currentTrial < totalTrials) {
                 runTrial();
+            } else {
+                endPhase();
             }
-        }, 1500);
+        }, 1500); 
     }
 
     function endPhase() {
@@ -335,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const rotatedRhombus = `<g transform="rotate(${rotation} 50 50)">${rhombusSVG}</g>`;
-        return `<svg viewBox="0 0 100 100" width="100%" height="100%">${rotatedRhombus}${smallTrianglesSVG}</svg>`;
+        return `<svg viewBox="0 0 100 100" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">${rotatedRhombus}${smallTrianglesSVG}</svg>`;
     }
 
     function shuffle(array) {
@@ -363,8 +361,35 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         localStorage.setItem('gameResults_SAT', JSON.stringify(results));
         console.log("Final SAT Results:", results);
+
+        sendResultsToServer(results);
         return results;
     }
+
+    function sendResultsToServer(results) {
+        const variables = [
+            { name: "accuracy", value: results.accuracy },
+            { name: "completion_time", value: results.completion_time },
+            { name: "omission_errors_percentage", value: results.omission_errors_percentage },
+            { name: "commission_errors_percentage", value: results.commission_errors_percentage }
+        ];
+    
+        variables.forEach(v => {
+            fetch("/save_result", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    task_name: "selective_attention_test",
+                    variable: v.name,
+                    value: v.value,
+                    assessment_acronym: "SAT",
+                    assessment_type: "attention_test",
+                    device: navigator.userAgent
+                })
+            });
+        });
+    }
+    
 
     // --- Start the game ---
     initializeGame();

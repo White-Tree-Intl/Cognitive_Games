@@ -228,24 +228,67 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {boolean} completed - True if the game was completed, false if ended prematurely.
      */
     function endGame(completed) {
-        gameArea.style.display = 'none'; // Hide the game area
-        progressBarContainer.style.display = 'none'; // Hide the progress bar
-
-        // Calculate statistics for the main game trials
+        // Hide game UI
+        gameArea.style.display = 'none';
+        progressBarContainer.style.display = 'none';
+    
+        // --- Calculate statistics for main game trials ---
         const mainGameData = allTrialData.filter(t => !t.isPractice);
         const correctTrials = mainGameData.filter(t => t.isCorrect);
-        const accuracy = mainGameData.length > 0 ? (correctTrials.length / mainGameData.length) * 100 : 0;
-        const avgResponseTime = correctTrials.length > 0 ? correctTrials.reduce((sum, t) => sum + t.responseTime, 0) / correctTrials.length : 0;
-
-        // Display end game messages and statistics
-        messageDisplayEnd.textContent = completed ? window.STRINGS.task_finished_title : 'Game Over';
+    
+        const accuracy = mainGameData.length > 0
+            ? (correctTrials.length / mainGameData.length) * 100
+            : 0;
+    
+        const avgResponseTime = correctTrials.length > 0
+            ? correctTrials.reduce((sum, t) => sum + t.responseTime, 0) / correctTrials.length
+            : 0;
+    
+        // --- Send results to backend ---
+        sendResultsToServer({
+            task_name: "VMT",
+            variable: "accuracy",
+            value: accuracy,
+            assessment_type: "cognitive",
+            assessment_acronym: "VMT",
+            group: null,
+            training_type: null,
+            device: navigator.userAgent,
+            gender: null,
+            birthdate: null,
+            country: null,
+            age: null
+        });
+    
+        sendResultsToServer({
+            task_name: "VMT",
+            variable: "avg_rt",
+            value: avgResponseTime,
+            assessment_type: "cognitive",
+            assessment_acronym: "VMT",
+            group: null,
+            training_type: null,
+            device: navigator.userAgent,
+            gender: null,
+            birthdate: null,
+            country: null,
+            age: null
+        });
+    
+        // --- Display results on screen ---
+        messageDisplayEnd.textContent = completed
+            ? window.STRINGS.task_finished_title
+            : 'Game Over';
+    
         messageDisplayEnd.innerHTML += `
-            <br><p>Accuracy: <strong>${accuracy.toFixed(1)}%</strong></p>
+            <br>
+            <p>Accuracy: <strong>${accuracy.toFixed(1)}%</strong></p>
             <p>Average Correct Response Time: <strong>${avgResponseTime.toFixed(0)} ms</strong></p>
         `;
-
-        endGameScreen.style.display = 'block'; // Show the end game screen
-    }
+    
+        // Show end screen
+        endGameScreen.style.display = 'block';
+    }    
 
 
     // --- Utility & Rendering Functions ---
@@ -373,4 +416,22 @@ document.addEventListener('DOMContentLoaded', () => {
         // Ensure window.STRINGS.current_trial_label is defined for localized string, fallback to 'Trial'
         progressText.textContent = `${window.STRINGS.current_trial_label || 'Trial'} ${relativeIndex + 1}/${trials.length}`;
     }
+
+    async function sendResultsToServer(resultData) {
+        try {
+            const response = await fetch("/save_result", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(resultData)
+            });
+    
+            const data = await response.json();
+            console.log("Saved:", data);
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+    
 });

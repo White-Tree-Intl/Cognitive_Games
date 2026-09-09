@@ -227,7 +227,41 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('gameData_DST', JSON.stringify(allStageData));
         localStorage.setItem('gameResults_DST', JSON.stringify(finalResults));
         console.log("Final DST Results:", finalResults);
+        sendResultsToServer(finalResults);
     }
+
+    function sendResultsToServer(results) {
+
+        const variables = [
+            { name: "memory_span", value: results.memory_span },
+            { name: "response_time", value: results.response_time },
+            { name: "omission_errors", value: results.omission_errors },
+            { name: "average_number_of_trials_in_correct_series", value: results.average_number_of_trials_in_correct_series }
+        ];
+    
+        variables.forEach(v => {
+    
+            fetch("/save_result", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    task_name: "digit_span",
+                    variable: v.name,
+                    value: v.value,
+                    assessment_acronym: "DST",
+                    assessment_type: "cognitive_test",
+                    training_type: null,
+                    device: navigator.userAgent
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log("Saved:", data))
+            .catch(err => console.error("Save error:", err));            
+    
+        });
+    }    
 
     // --- UI Helper Functions ---
     function generateNumberPad() {

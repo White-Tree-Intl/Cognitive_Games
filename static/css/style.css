@@ -750,6 +750,7 @@ h1, h2 {
 .wall-left { border-left: 2px solid var(--primary-color); }
 
 #interactive-layer {
+    z-index: 100;
     position: absolute;
     top: 0;
     left: 0;
@@ -773,6 +774,7 @@ h1, h2 {
     /* border-radius is now set by JavaScript */
     box-shadow: 0 0 5px rgba(0,0,0,0.5);
     transition: width 0.2s ease-in-out, height 0.2s ease-in-out, border-radius 0.2s ease-in-out; /* Added border-radius transition */
+    pointer-events: none;
 }
 .maze-goal::after {
     content: '★';
@@ -1008,4 +1010,101 @@ h1, h2 {
     100% {
         opacity: 0.4; /* Stays faded out */
     }
+}
+
+
+/* =============================================== */
+/* === 4. AUTH PAGES (SIGNIN / SIGNUP) === */
+/* =============================================== */
+
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    padding: 35px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    text-align: center;
+}
+
+.auth-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.auth-form input {
+    padding: 12px 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 5px rgba(0,119,190,0.3);
+}
+
+.auth-button {
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: var(--secondary-color);
+    color: white;
+    transition: background-color 0.25s ease, transform 0.1s ease;
+}
+
+.auth-button:hover {
+    background-color: var(--primary-color);
+}
+
+.auth-button:active {
+    transform: scale(0.97);
+}
+
+.auth-link {
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+.auth-link a {
+    color: var(--secondary-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+.logout-button{
+    background:#e74c3c;
+    color:white;
+    padding:8px 16px;
+    text-decoration:none;
+    border-radius:6px;
+    font-weight:bold;
+}
+
+.logout-button:hover{
+    background:#c0392b;
+}
+
+#response-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 45px;
+    max-width: 320px;
+    margin: 20px auto;
 }

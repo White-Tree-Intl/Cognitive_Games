@@ -152,11 +152,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function endPhase() {
         gameArea.style.display = 'none';
         if (isPractice) {
+            startMainGameBtn.disabled = true;
+            practiceAgainBtn.disabled = true;
             phaseOverlay.style.display = 'flex';
+    
+            setTimeout(() => {
+                startMainGameBtn.disabled = false;
+                practiceAgainBtn.disabled = false;
+            }, 500);
         } else {
             endGame();
         }
     }
+    
 
     function endGame() {
         progressBarContainer.style.display = 'none';
@@ -209,6 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('gameData_PVT', JSON.stringify(rawData));
         localStorage.setItem('gameResults_PVT', JSON.stringify(finalResults));
         console.log("Final PVT Results:", finalResults);
+
+        sendResultsToServer(finalResults);
     }
 
     // --- UI Helper Functions ---
@@ -259,4 +269,41 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBarFill.style.width = `${progress}%`;
         progressText.textContent = `${currentTrialIndex} / ${trialList.length}`;
     }
+
+    function sendResultsToServer(results) {
+        const variables = [
+            { name: "accuracy", value: results.accuracy },
+            { name: "accuracy_in_low_demand", value: results.accuracy_in_low_demand },
+            { name: "accuracy_in_high_demand", value: results.accuracy_in_high_demand },
+            { name: "response_time", value: results.response_time },
+            { name: "response_time_in_low_demand", value: results.response_time_in_low_demand },
+            { name: "response_time_in_high_demand", value: results.response_time_in_high_demand },
+            { name: "omission_errors", value: results.omission_errors },
+            { name: "omission_errors_in_low_demand", value: results.omission_errors_in_low_demand },
+            { name: "omission_errors_in_high_demand", value: results.omission_errors_in_high_demand },
+            { name: "omission_errors_percentage", value: results.omission_errors_percentage },
+            { name: "commission_errors", value: results.commission_errors },
+            { name: "inaccurate_clicks", value: results.inaccurate_clicks }
+        ];
+    
+        variables.forEach(v => {
+            fetch("/save_result", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    task_name: "psychomotor_vigilance_test", // نام آزمون
+                    variable: v.name,
+                    value: v.value,
+                    assessment_acronym: "PVT",
+                    assessment_type: "reaction_time_test",
+                    training_type: null, // اگر تمرین باشد، مقدار دهید
+                    device: navigator.userAgent
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log(`Saved ${v.name}:`, data))
+            .catch(err => console.error(`Save error ${v.name}:`, err));
+        });
+    }
+    
 });

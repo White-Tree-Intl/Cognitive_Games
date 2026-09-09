@@ -133,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
             markerPos = { x: mousePos.x + touchOffset.x, y: mousePos.y + touchOffset.y };
 
             // Move the visual marker
+            touchMarker.style.left = '0px';
             touchMarker.style.transform = `translate(${markerPos.x}px, ${markerPos.y}px) translate(-50%, -50%)`;
 
         } else if (e.clientX) { // Check if it's a mouse event
@@ -219,11 +220,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (currentSegmentIndex >= SEGMENTS.length) {
                 endGame();
-            } else if (currentSegmentIndex === 2) { // End of learning phase
+            } else if (currentSegmentIndex === 2) { 
                 gameActive = false;
                 cancelAnimationFrame(animationFrameId);
                 clearTimeout(segmentTimeout);
+            
+                startMainGameBtn.disabled = true;
+                practiceAgainBtn.disabled = true;
                 phaseOverlay.style.display = 'flex';
+            
+                setTimeout(() => {
+                    startMainGameBtn.disabled = false;
+                    practiceAgainBtn.disabled = false;
+                }, 500);
             } else {
                 runSegmentManager();
             }
@@ -319,10 +328,13 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('gameData_EHC-MUD', JSON.stringify(rawData));
         localStorage.setItem('gameResults_EHC-MUD', JSON.stringify(finalResults));
         console.log("Final EHC-MUD Results:", finalResults);
+
+        sendResultsToServer(finalResults);
     }
 
     // --- UI Helper Functions ---
     function updateBallPosition() {
+        ball.style.left = '0px';
         ball.style.transform = `translate(${ballPos.x - BALL_RADIUS}px, ${ballPos.y - BALL_RADIUS}px)`;
     }
 
@@ -353,4 +365,37 @@ document.addEventListener('DOMContentLoaded', () => {
             progressText.textContent = `${phaseText} - ${SEGMENTS[currentSegmentIndex].speed}`;
         }
     }
+
+    function sendResultsToServer(results) {
+        const variables = [
+            { name: "accuracy", value: results.accuracy },
+            { name: "accuracy_in_fast_speed", value: results.accuracy_in_fast_speed },
+            { name: "accuracy_in_slow_speed", value: results.accuracy_in_slow_speed },
+            { name: "accuracy_in_long_segments_duration", value: results.accuracy_in_long_segments_duration },
+            { name: "accuracy_in_short_segments_duration", value: results.accuracy_in_short_segments_duration },
+            { name: "distance_from_the_ball_center", value: results.distance_from_the_ball_center }
+        ];
+    
+        variables.forEach(v => {
+            fetch("/save_result", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    task_name: "eye_hand_coordination_mud",
+                    variable: v.name,
+                    value: v.value,
+                    assessment_acronym: "EHC-MUD",
+                    assessment_type: "cognitive_test",
+                    training_type: null,
+                    device: navigator.userAgent
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log(`Saved ${v.name}:`, data))
+            .catch(err => console.error(`Save error ${v.name}:`, err));
+        });
+    }
+    
 });

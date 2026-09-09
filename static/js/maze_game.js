@@ -199,20 +199,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Transition logic
         if (isPractice) {
-            // If practice ended, show the overlay to choose next action
             phaseOverlay.style.display = 'flex';
-            return; // Don't automatically proceed
+            return;
         }
 
-        // If it was a testing stage, move to the next one
         currentStageIndex++;
+
         if (currentStageIndex >= STAGE_ORDER.length) {
-            // All testing stages done, end the game
             endGame();
         } else {
-            // Wait a bit before starting the next stage
-            messageDisplay.textContent = `Stage ${currentStageIndex -1} finished. Get ready...`; // Temporary message
-            setTimeout(runNextStage, 1500); // Start next stage after 1.5 seconds
+            const finishedStageNumber = currentStageIndex;
+            messageDisplay.textContent = `مرحله ${finishedStageNumber} تمام شد. برای مرحله بعد آماده شوید...`;
+
+            setTimeout(runNextStage, 1500);
         }
     }
 
@@ -317,6 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('gameData_MT', JSON.stringify(allStageData));
         localStorage.setItem('gameResults_MT', JSON.stringify(finalResults));
         console.log("Final Maze Test Results:", finalResults);
+
+        sendResultsToServer(finalResults);
     }
 
     // Recalculates sizes and re-renders the maze grid and interactive elements
@@ -462,7 +463,6 @@ document.addEventListener('DOMContentLoaded', () => {
         interactiveLayer.appendChild(goalEl);
         // --- End of Goal Rendering ---
 
-
         // --- Find and Render Possible Moves ---
         const possibleMoves = findPossibleMoves();
 
@@ -473,24 +473,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 move.c >= goalPos.c && move.c < goalPos.c + goalPos.w
             );
 
-            // Only render the move circle if it is NOT inside the goal area
-            if (!isInsideGoal) {
-                const moveEl = document.createElement('div');
-                moveEl.className = 'maze-possible-move';
-                moveEl.style.width = `${cellSize * 0.5}px`;
-                moveEl.style.height = `${cellSize * 0.5}px`;
-                moveEl.style.transform = `translate(${move.c * cellSize + cellSize * 0.25}px, ${move.r * cellSize + cellSize * 0.25}px)`;
+            const moveEl = document.createElement('div');
+            moveEl.className = 'maze-possible-move';
+            moveEl.style.width = `${cellSize * 0.5}px`;
+            moveEl.style.height = `${cellSize * 0.5}px`;
+            moveEl.style.transform = `translate(${move.c * cellSize + cellSize * 0.25}px, ${move.r * cellSize + cellSize * 0.25}px)`;
+            moveEl.style.zIndex = '100';
 
-                moveEl.addEventListener('click', (e) => {
-                     e.preventDefault();
-                     handleMove(move.r, move.c);
-                });
-                moveEl.addEventListener('touchend', (e) => {
-                     e.preventDefault();
-                     handleMove(move.r, move.c);
-                });
-                interactiveLayer.appendChild(moveEl);
+            if (isInsideGoal) {
+                moveEl.style.opacity = '0'; 
             }
+
+            moveEl.addEventListener('click', (e) => {
+                 e.preventDefault();
+                 handleMove(move.r, move.c);
+            });
+            moveEl.addEventListener('touchend', (e) => {
+                 e.preventDefault();
+                 handleMove(move.r, move.c);
+            });
+            
+            interactiveLayer.appendChild(moveEl);
         });
     }
 
@@ -562,6 +565,48 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update text based on practice or testing stage
         progressText.textContent = isPractice ? 'Practice' : `Stage ${currentStageIndex}/${STAGE_ORDER.length - 1}`;
     }
+
+    function sendResultsToServer(results) {
+        const variables = [
+            { name: "mazes_completed", value: results.mazes_completed },
+            { name: "mazes_completed_with_additional_steps", value: results.mazes_completed_with_additional_steps },
+            { name: "mazes_completed_without_additional_steps", value: results.mazes_completed_without_additional_steps },
+            { name: "mazes_not_completed_due_to_reaching_max_steps", value: results.mazes_not_completed_due_to_reaching_max_steps },
+            { name: "omission_errors", value: results.omission_errors },
+            { name: "completion_time", value: results.completion_time },
+            { name: "completion_time_in_first_maze", value: results.completion_time_in_first_maze },
+            { name: "completion_time_in_second_maze", value: results.completion_time_in_second_maze },
+            { name: "completion_time_in_third_maze", value: results.completion_time_in_third_maze },
+            { name: "steps_in_first_maze", value: results.steps_in_first_maze },
+            { name: "steps_in_second_maze", value: results.steps_in_second_maze },
+            { name: "steps_in_third_maze", value: results.steps_in_third_maze },
+            { name: "additional_steps_direct_score", value: results.additional_steps_direct_score },
+            { name: "additional_steps", value: results.additional_steps },
+            { name: "additional_steps_in_first_maze", value: results.additional_steps_in_first_maze },
+            { name: "additional_steps_in_second_maze", value: results.additional_steps_in_second_maze },
+            { name: "additional_steps_in_third_maze", value: results.additional_steps_in_third_maze }
+        ];
+    
+        variables.forEach(v => {
+            fetch("/save_result", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    task_name: "maze_test", // Task name for the maze game
+                    variable: v.name,
+                    value: v.value,
+                    assessment_acronym: "MT", // Acronym for Maze Test
+                    assessment_type: "cognitive_test",
+                    training_type: null, // Or specify if applicable
+                    device: navigator.userAgent
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log(`Saved ${v.name}:`, data))
+            .catch(err => console.error(`Save error ${v.name}:`, err));
+        });
+    }
+    
 
     // Re-render the maze when the window (or game area) is resized
     const resizeObserver = new ResizeObserver(() => {

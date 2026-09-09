@@ -261,6 +261,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const results = calculateAndSaveResults();
 
+        sendResultsToServer({
+            task_name: "VWM",
+            variable: "memory_span",
+            value: results.memory_span,
+            assessment_type: "cognitive",
+            assessment_acronym: "VWM",
+            group: null,
+            training_type: null,
+            device: navigator.userAgent,
+            gender: null,
+            birthdate: null,
+            country: null,
+            age: null
+        });
+        
+        sendResultsToServer({
+            task_name: "VWM",
+            variable: "avg_rt",
+            value: results.response_time,
+            assessment_type: "cognitive",
+            assessment_acronym: "VWM",
+            group: null,
+            training_type: null,
+            device: navigator.userAgent,
+            gender: null,
+            birthdate: null,
+            country: null,
+            age: null
+        });
+        
+
         // Use the dedicated message display for the end screen
         messageDisplayEnd.textContent = completedSuccessfully
             ? window.STRINGS.task_finished_title
@@ -312,12 +343,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const finalResults = {
             memory_span,
-            memory_span_in_phase_1,
-            memory_span_in_phase_2,
+            memory_span_phase_1,
+            memory_span_phase_2,
             response_time,
             omission_errors: omissionErrorsCount,
             average_number_of_trials_in_correct_series
-        };
+        };        
 
         localStorage.setItem('gameData_VWM', JSON.stringify(allPhaseData));
         localStorage.setItem('gameResults_VWM', JSON.stringify(finalResults));
@@ -437,4 +468,22 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBarFill.style.width = `${progress}%`;
         progressText.textContent = `${window.STRINGS[`phase_${currentPhase}_title`]} (${sequenceLength}/${MAX_SEQUENCE})`;
     }
+
+    async function sendResultsToServer(resultData) {
+        try {
+            const response = await fetch("/save_result", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(resultData)
+            });
+    
+            const data = await response.json();
+            console.log("Saved:", data);
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+    
 });

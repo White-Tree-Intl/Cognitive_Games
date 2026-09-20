@@ -79,3 +79,20 @@ Now, we need to install the libraries that this project depends on.
       * [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 Congratulations\! The cognitive games application is now running.
+
+## Docker Deployment
+
+This project includes a production Docker setup. It runs Flask through Gunicorn
+and keeps the SQLite database in a named Docker volume.
+
+1. Copy `.env.example` to `.env` and set a long random `SECRET_KEY`.
+2. Build and start the service:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+3. Open `http://localhost:5000` (or the server IP and port 5000).
+
+The `instance` volume is intentionally persistent so users and assessment
+results survive container restarts. Do not commit `.env` or production secrets.

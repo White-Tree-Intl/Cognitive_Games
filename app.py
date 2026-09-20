@@ -30,7 +30,7 @@ from io import BytesIO
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'your_secret_key_here'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-only-change-me')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -650,4 +650,6 @@ with app.app_context():
 # =====================================================
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    debug_mode = os.getenv('FLASK_DEBUG', '0').lower() in {'1', 'true', 'yes'}
+    port = int(os.getenv('PORT', '5000'))
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)
